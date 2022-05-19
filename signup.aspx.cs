@@ -50,25 +50,29 @@ public partial class signup : System.Web.UI.Page
         {
             //creating the connection string              
             string connection = ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
-            SqlConnection con = new SqlConnection(connection);
+            MySqlConnection con = new MySqlConnection(connection);
             String passwords = encryption(password);
             con.Open();
             // Check whether the Username Found in the Existing DB  
-            String search = "SELECT * FROM UserAccount WHERE (UserName = '" + username + "');";
-            SqlCommand cmds = new SqlCommand(search, con);
-            SqlDataReader sqldrs = cmds.ExecuteReader();
+            String search = "SELECT * FROM users WHERE (username = '" + username + "');";
+            MySqlCommand cmds = new MySqlCommand (search, con);
+            MySqlDataReader sqldrs = cmds.ExecuteReader();
             if (sqldrs.Read())
             {
                 String passed = (string)sqldrs["Password"];
                 Label1.Text = "Username Already Taken";
+                
             }
+                
+
             else
             {
+                sqldrs.Close();
                 try
                 {
                     // if the Username not found create the new user accound  
-                    string sql = "INSERT INTO UserAccount (UserName, Password) VALUES ('" + username + "','" + passwords + "');";
-                    SqlCommand cmd = new SqlCommand(sql, con);
+                    string sql = "INSERT INTO users (username, password ) VALUES ('"  + username + "','" + passwords + "');";
+                    MySqlCommand cmd = new MySqlCommand(sql, con);
                     cmd.ExecuteNonQuery();
                     String Message = "saved Successfully";
                     Label1.Text = Message.ToString();
@@ -78,7 +82,7 @@ public partial class signup : System.Web.UI.Page
                 }
                 catch (Exception ex)
                 {
-                    Label1.Text = ex.ToString();
+                    //Label1.Text = ex.ToString();
                 }
                 con.Close();
             }
@@ -96,21 +100,21 @@ public partial class signup : System.Web.UI.Page
     String username = TextBox1.Text.ToString();  
     String password = TextBox2.Text;  
     string con = ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();  
-    SqlConnection connection = new SqlConnection(con);  
+    MySqlConnection connection = new MySqlConnection(con);  
     connection.Open();  
 //ncrypt the given password  
     string passwords = encryption(password);  
-    String query = "SELECT UserName, Password FROM UserAccount WHERE (UserName = '" + username + "') AND (Password = '"+passwords+"');";  
-  
-        SqlCommand cmd = new SqlCommand(query, connection);  
-        SqlDataReader sqldr = cmd.ExecuteReader();  
+    String query = "SELECT username, password FROM users WHERE (username = '" + username + "') AND (password = '"+passwords+"');";
+
+    MySqlCommand cmd = new MySqlCommand(query, connection);  
+        MySqlDataReader sqldr = cmd.ExecuteReader();  
         if (sqldr.Read())  
         {  
                 Response.Redirect("Default3.aspx");  
         }  
             else  
             {  
-                Label1.Text = "User or password is in correct not found";   
+                Label1.Text = "User or password is incorrect not found";   
                  
             }  
           
